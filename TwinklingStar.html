@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Twinkling Star(不支持IE8-)</title>
+		<style>
+			*{
+				padding: 0;
+				margin: 0;
+			}
+			html{
+				overflow: hidden;
+			}
+			#myCanvas{
+				background: #000;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="myCanvas"></canvas>
+		<audio src="audio/bgmusic.mp3" id="audio"></audio>
+		<script>
+			var cvs = document.getElementById("myCanvas");
+			var cxt = cvs.getContext("2d");
+			var bgMusic = document.getElementById("audio");
+			var w = document.documentElement.clientWidth;
+			var h = document.documentElement.clientHeight;
+			var arr = [];
+			var angle = 0;
+			cvs.width = document.documentElement.clientWidth;
+			cvs.height = document.documentElement.clientHeight;
+			
+			//play background music
+			bgMusic.play();
+			
+			//star attribute data
+			for(var i = 0;i<500;i++){
+				var json = {
+					x: w/2 + parseInt(Math.random()*1300-650),
+					y: h/2 + parseInt(Math.random()*600-300),
+					r1: 15 + parseInt(Math.random()*4-2),
+					r2: 5 + parseInt(Math.random()*4-2),
+					num: 6 + parseInt(Math.random()*2-1),
+					angle: 360*Math.random(),
+					changeAngle: parseInt(Math.random()*2+4)
+				}
+				arr.push(json);
+			}
+			
+			//draw stars with changeable attributes
+			setInterval(function(){
+				cxt.clearRect(0,0,w,h);
+				for(var i = 0;i<500;i++){
+					arr[i].angle += arr[i].changeAngle;
+					cxt.save();
+					cxt.beginPath();
+					cxt.translate(arr[i].x,arr[i].y);
+					angle += 2;
+					cxt.rotate(Math.cos(Math.PI*arr[i].angle/180));
+					cxt.scale(Math.cos(Math.PI*arr[i].angle/180),Math.cos(Math.PI*arr[i].angle/180));
+					cxt.globalAlpha = Math.abs(Math.cos(Math.PI*arr[i].angle/180));
+					cxt.translate(-arr[i].x,-arr[i].y);
+					starDraw(arr[i].x,arr[i].y,arr[i].r1,arr[i].r2,arr[i].num,color());	
+					cxt.restore();
+				}
+			},100)
+			
+			//star draw function
+			function starDraw(x,y,r1,r2,num,color){
+				var angle = Math.PI/num;
+				var arr=[];
+				for(var i=0;i<2*num;i++){
+					var star = {};
+					if(i%2 == 0){
+						star.cx = x+r1*Math.cos(angle*i);
+						star.cy = y+r1*Math.sin(angle*i);
+					}else{
+						star.cx = x+r2*Math.cos(angle*i);
+						star.cy = y+r2*Math.sin(angle*i);
+					}
+					arr.push(star);
+				}
+				cxt.beginPath();
+				cxt.fillStyle = color;
+				cxt.moveTo(arr[0].cx,arr[0].cy);
+				for(var j=1;j<arr.length;j++){
+					cxt.lineTo(arr[j].cx,arr[j].cy)
+				}
+				cxt.fill();
+				cxt.closePath();
+			}
+			
+			//random color function
+			function color(){
+				var r = parseInt((Math.random()*256)).toString(16);
+				var g = parseInt((Math.random()*256)).toString(16);
+				var b = parseInt((Math.random()*256)).toString(16);
+				return "#"+r+g+b;
+			}
+		</script>
+	</body>
+</html>

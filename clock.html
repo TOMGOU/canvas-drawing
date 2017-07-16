@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>clock</title>
+		<style>
+			*{
+				padding: 0;
+				margin: 0;
+			}
+			#myCanvas{
+				background: lemonchiffon;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="myCanvas" width="1300" height="620"></canvas>
+		<audio src="audio/1.wav" id="audio"></audio>
+	</body>
+	<script>
+		var cvs = document.getElementById("myCanvas");
+		var cxt = cvs.getContext("2d");
+		var cx =  600;
+		var cy = 310;
+		var radius = 300;
+		var audio = document.getElementById("audio");
+		audio.ontimeupdate = function(){
+			if(audio.currentTime >= 0.02){
+				audio.pause();
+			}
+		}
+		var timer = setInterval(function(){
+			var time = new Date();
+			var hrs = time.getHours();
+			var min = time.getMinutes();
+			var sec = time.getSeconds();
+			var hAngle = Math.PI*(hrs*30+min*6/12-90)/180;
+			var mAngle = Math.PI*(min*6-90)/180;
+			var sAngle = Math.PI*(sec*6-90)/180;
+			var col = cxt.createRadialGradient(cx,cy,50,cx,cy,300);
+			audio.currentTime = 0.1;
+			audio.play();
+			cxt.clearRect(0,0,1300,620);
+			cxt.beginPath();
+			col.addColorStop(0,"#f0f0f0");
+			col.addColorStop(1,"#999");
+			cxt.fillStyle = col;
+			cxt.strokeStyle = "red";
+			cxt.shadowColor = "yellow";
+			cxt.shadowBlur = 50000000;
+			cxt.lineWidth = 20;
+			cxt.arc(600,310,300,0,Math.PI*2);
+			cxt.font = "bold 24px Arial";
+			cxt.stroke();
+			cxt.fill();
+			cxt.beginPath();
+			cxt.shadowBlur = 0;
+			cxt.fillStyle = "red";
+			cxt.arc(600,310,8,0,Math.PI*2);
+			cxt.fill();
+			cxt.closePath();
+			cxt.beginPath();
+			cxt.shadowColor = "#333";
+			cxt.shadowBlur = 0;
+			cxt.lineWidth = 5;
+			for(var i=0;i<60;i++){
+				var radius1 = i%5==0?radius -30:radius -15;
+				cxt.beginPath();
+				cxt.lineCap = "square";
+				cxt.strokeStyle = "yellowgreen";
+				cxt.shadowBlur = 0;
+				cxt.lineWidth = 5;
+				cxt.moveTo(cx+radius*Math.cos(Math.PI*6*i/180),cy+radius*Math.sin(Math.PI*6*i/180));
+				cxt.lineTo(cx+(radius1)*Math.cos(Math.PI*6*i/180),cy+(radius1)*Math.sin(Math.PI*6*i/180));
+				cxt.stroke();
+			}
+			for(var i=1;i<=12;i++){
+				cxt.beginPath();
+				cxt.shadowBlur = 0;
+				cxt.lineWidth = 1;
+				cxt.textAlign = "center";
+				cxt.textBaseline = "middle";
+				cxt.font = '40px YouYuan';
+				cxt.strokeStyle = "yellow";
+				cxt.strokeText(i,cx+245*Math.cos(Math.PI*(i*30-90)/180),cy+245*Math.sin(Math.PI*(i*30-90)/180));
+			}
+			cxt.closePath();
+			cxt.beginPath();
+			drawPointer(hAngle,200,8,"red");
+			drawPointer(mAngle,150,6,"green");
+			drawPointer(sAngle,80,4,"purple");
+		},1000)
+		function drawPointer(angle,len,width,color){
+			cxt.beginPath();
+			cxt.lineCap = "round";
+			cxt.lineWidth = width;
+			cxt.strokeStyle = color;
+			cxt.moveTo(cx,cy);
+			cxt.lineTo(cx+(radius-len)*Math.cos(angle),cy+(radius-len)*Math.sin(angle));
+			cxt.stroke();
+			cxt.closePath();
+		}	
+	</script>
+</html>
